@@ -8,7 +8,8 @@ const UploadComponent = ({ closeUploadModal }) => {
   const [spreadsheetLink, setSpreadsheetLink] = useState("");
 
   const handleFileUpload = (e) => {
-    setFiles([...files, ...e.target.files]);
+    const newFiles = Array.from(e.target.files);
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
   };
 
   const handleLibraryClick = () => {
@@ -102,6 +103,24 @@ const UploadComponent = ({ closeUploadModal }) => {
             <span>Camera</span>
           </button>
         </div>
+      </div>
+
+      {/* File Preview */}
+      <div className="mt-4">
+        {files.length > 0 ? (
+          <div>
+            <h3 className="font-semibold mb-2">Uploaded Files:</h3>
+            <ul className="list-disc pl-5">
+              {files.map((file, index) => (
+                <li key={index} className="text-gray-700">
+                  {file.name} - {(file.size / 1024).toFixed(2)} KB
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="text-gray-500">No files uploaded yet.</p>
+        )}
       </div>
 
       {/* Google Spreadsheet Link Input */}
