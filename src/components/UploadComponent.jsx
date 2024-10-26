@@ -52,6 +52,15 @@ const UploadComponent = ({ closeUploadModal }) => {
     }
   };
 
+  const handleUpload = () => {
+    if (files.length === 0) {
+      Swal.fire("Error", "Please upload at least one file.", "error");
+    } else {
+      Swal.fire("Uploaded!", "Your files have been uploaded successfully.", "success");
+      setFiles([]); // Clear the files after upload if desired
+    }
+  };
+
   return (
     <div className="w-full max-w-lg mx-auto p-6 bg-white shadow-md rounded-md relative">
       {/* Close Button */}
@@ -143,7 +152,7 @@ const UploadComponent = ({ closeUploadModal }) => {
       )}
 
       <div className="mt-4 flex justify-end">
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        <button onClick={handleUpload} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
           Upload
         </button>
       </div>
