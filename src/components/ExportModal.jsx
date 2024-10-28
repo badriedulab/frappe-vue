@@ -1,24 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ImCross } from "react-icons/im";
 import * as XLSX from "xlsx";
 
-const ExportModal = ({ isOpen, onClose }) => {
+const ExportModal = ({ isOpen, onClose, documentType }) => {
   const [fileType, setFileType] = useState("CSV");
   const [exportType, setExportType] = useState("All Records");
   const [selectedFields, setSelectedFields] = useState([]);
-  const [fields, setFields] = useState([
-    { name: "ID", mandatory: true },
-    { name: "Employee", mandatory: true },
-    { name: "Series", mandatory: false },
-    { name: "First Name", mandatory: true },
-    { name: "Gender", mandatory: true },
-    { name: "Date of Birth", mandatory: true },
-    { name: "Date of Joining", mandatory: true },
-    { name: "Status", mandatory: false },
-    { name: "Company", mandatory: true },
-    { name: "Relation", mandatory: false },
-    // Add other fields as needed
-  ]);
+  const [fields, setFields] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFields = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(
+          `https://document-backend-b3fs.onrender.com/document-fields?documentType=${documentType}`
+        );
+        const data = await response.json();
+        setFields(data);
+      } catch (error) {
+        console.error("Failed to fetch fields:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (documentType) {
+      fetchFields();
+    }
+  }, [documentType]);
 
   const toggleField = (fieldName) => {
     setSelectedFields((prevSelected) =>
@@ -29,11 +39,11 @@ const ExportModal = ({ isOpen, onClose }) => {
   };
 
   const handleSelectAll = () => {
-    setSelectedFields(fields.map((field) => field.name));
+    setSelectedFields(fields.map((field) => field.field_name));
   };
 
   const handleSelectMandatory = () => {
-    setSelectedFields(fields.filter((field) => field.mandatory).map((field) => field.name));
+    setSelectedFields(fields.filter((field) => field.mandatory).map((field) => field.field_name));
   };
 
   const handleDeselectAll = () => {
@@ -41,62 +51,53 @@ const ExportModal = ({ isOpen, onClose }) => {
   };
 
   const handleExport = () => {
+    // Mock data for export purposes
     const data = [
-      // Sample data for demonstration; replace with your actual data
       { ID: 1, Employee: "John Doe", Series: "A", "First Name": "John", Gender: "Male", "Date of Birth": "1990-01-01", "Date of Joining": "2020-01-01", Status: "Active", Company: "ABC Corp", Relation: "Single" },
       { ID: 2, Employee: "Jane Smith", Series: "B", "First Name": "Jane", Gender: "Female", "Date of Birth": "1992-02-02", "Date of Joining": "2021-01-01", Status: "Active", Company: "XYZ Corp", Relation: "Married" },
     ];
-  
-    // Filter the data based on selected fields
-    const filteredData = data.map((row) =>
-      Object.keys(row)
-        .filter((key) => selectedFields.includes(key))
-        .reduce((obj, key) => {
-          obj[key] = row[key];
-          return obj;
-        }, {})
+
+    // Filter data to include only selected fields
+    const filteredData = data.map((record) =>
+      selectedFields.reduce((obj, field) => {
+        if (record[field] !== undefined) obj[field] = record[field];
+        return obj;
+      }, {})
     );
-  
-    // Handle export based on exportType
+
+    // Determine export type and prepare data accordingly
+    let exportData = [];
     if (exportType === "Blank Template") {
-      // Create a blank template with only headers
-      const blankTemplate = [Object.fromEntries(selectedFields.map((field) => [field, ""]))];
-  
-      if (fileType === "Excel") {
-        exportToExcel(blankTemplate);
-      } else {
-        exportToCSV(blankTemplate);
-      }
+      exportData = [Object.fromEntries(selectedFields.map((field) => [field, ""]))];
+    } else if (exportType === "First Five Records") {
+      exportData = filteredData.slice(0, 5);
     } else {
-      // Include data rows for other export types
-      if (fileType === "Excel") {
-        exportToExcel(filteredData);
-      } else {
-        exportToCSV(filteredData);
-      }
+      exportData = filteredData;
     }
-  
+
+    // Call appropriate export function based on file type
+    if (fileType === "Excel") {
+      exportToExcel(exportData);
+    } else {
+      exportToCSV(exportData);
+    }
+
+    // Close the modal after export
     onClose();
   };
 
-  const exportToExcel = (data) => { 
+  const exportToExcel = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "ExportedData");
-
-    // Generate a download link
     XLSX.writeFile(workbook, "ExportedData.xlsx");
   };
 
   const exportToCSV = (data) => {
     const worksheet = XLSX.utils.json_to_sheet(data);
     const csvData = XLSX.utils.sheet_to_csv(worksheet);
-
-    // Create a Blob from the CSV data
     const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
-
-    // Create a link to download the CSV file
     const link = document.createElement("a");
     link.href = url;
     link.setAttribute("download", "ExportedData.csv");
@@ -152,17 +153,21 @@ const ExportModal = ({ isOpen, onClose }) => {
 
         {/* Fields List */}
         <div className="max-h-48 overflow-y-auto border border-gray-300 rounded p-2">
-          {fields.map((field) => (
-            <div key={field.name} className="flex items-center mb-2">
-              <input
-                type="checkbox"
-                checked={selectedFields.includes(field.name)}
-                onChange={() => toggleField(field.name)}
-                className="mr-2"
-              />
-              <label className="text-gray-700">{field.name}</label>
-            </div>
-          ))}
+          {loading ? (
+            <p>Loading fields...</p>
+          ) : (
+            fields.map((field) => (
+              <div key={field.field_id} className="flex items-center mb-2">
+                <input
+                  type="checkbox"
+                  checked={selectedFields.includes(field.field_name)}
+                  onChange={() => toggleField(field.field_name)}
+                  className="mr-2"
+                />
+                <label className="text-gray-700">{field.field_name}</label>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Export Button */}

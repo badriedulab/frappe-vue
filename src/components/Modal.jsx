@@ -30,6 +30,8 @@ const Modal = ({ isOpen, onClose }) => {
           throw new Error("Failed to fetch document types");
         }
         const data = await response.json();
+        // console.log(data);
+        
         setDocumentTypes(data);
       } catch (error) {
         setError(error.message);
@@ -123,9 +125,9 @@ const Modal = ({ isOpen, onClose }) => {
                   className="w-full p-2 border border-gray-300 rounded"
                 >
                   <option value="">Select Document Type</option>
-                  {documentTypes.map((docType) => (
-                    <option key={docType.id} value={docType.type}>
-                      {docType.type}
+                  {documentTypes?.map((docType) => (
+                    <option key={docType.id} value={docType.document_name}>
+                      {docType.document_name}
                     </option>
                   ))}
                 </select>
@@ -184,6 +186,7 @@ const Modal = ({ isOpen, onClose }) => {
               <ExportModal
                 isOpen={isExportModalOpen}
                 onClose={() => setExportModalOpen(false)}
+                documentType={documentType}
               />
               <div className="mt-4">
                 <h2>Or</h2>
