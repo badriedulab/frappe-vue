@@ -30,8 +30,6 @@ const Modal = ({ isOpen, onClose }) => {
           throw new Error("Failed to fetch document types");
         }
         const data = await response.json();
-        // console.log(data);
-        
         setDocumentTypes(data);
       } catch (error) {
         setError(error.message);
@@ -81,18 +79,18 @@ const Modal = ({ isOpen, onClose }) => {
     <>
       {/* Modal Container */}
       <div className="inset-0 z-30 p-6 w-full">
-        <div className="bg-gray-100 p-6 w-full rounded-lg">
+        <div className="bg-gray-100 p-6 w-full rounded-lg text-sm">
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="text-gray-600 hover:text-gray-800"
+            className="text-gray-600 hover:text-gray-800 text-sm"
           >
             <ImCross />
           </button>
 
           {/* Header Section */}
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-lg font-semibold text-gray-800">
               New Data Import
             </h2>
             <div className="flex items-center mt-6">
@@ -122,7 +120,7 @@ const Modal = ({ isOpen, onClose }) => {
                 <select
                   value={documentType}
                   onChange={handleDoctypeChange}
-                  className="w-full p-2 border border-gray-300 rounded"
+                  className="w-full p-2 border border-gray-300 rounded text-sm"
                 >
                   <option value="">Select Document Type</option>
                   {documentTypes?.map((docType) => (
@@ -142,7 +140,7 @@ const Modal = ({ isOpen, onClose }) => {
               <select
                 value={importType}
                 onChange={(e) => setImportType(e.target.value)}
-                className="w-full py-2 border border-gray-300 rounded"
+                className="w-full py-2 border border-gray-300 rounded text-sm"
               >
                 <option value="">Select Import Type</option>
                 <option value="add">Add New</option>
@@ -156,7 +154,7 @@ const Modal = ({ isOpen, onClose }) => {
             <div className="flex justify-end mt-4">
               <button
                 onClick={handleSave}
-                className="bg-blue-600 text-white p-3 rounded"
+                className="bg-blue-600 text-white p-3 rounded text-sm"
               >
                 Save
               </button>
@@ -168,7 +166,7 @@ const Modal = ({ isOpen, onClose }) => {
             <div>
               <div>
                 <button
-                  className="bg-white p-2"
+                  className="bg-white p-2 text-sm"
                   onClick={() => setExportModalOpen(true)}
                 >
                   Download Template
@@ -177,7 +175,7 @@ const Modal = ({ isOpen, onClose }) => {
               <div className="mt-4 grid grid-cols-1 gap-6">
                 <label>Import File</label>
                 <div>
-                  <button onClick={openUploadModal} className="bg-white p-2">
+                  <button onClick={openUploadModal} className="bg-white p-2 text-sm">
                     Attach file
                   </button>
                 </div>
@@ -199,7 +197,7 @@ const Modal = ({ isOpen, onClose }) => {
                     placeholder="Enter Google Sheets URL"
                     value={googleSheetUrl}
                     onChange={handleGoogleSheetUrlChange}
-                    className="w-full p-2 border border-gray-300 rounded"
+                    className="w-full p-2 border border-gray-300 rounded text-sm"
                   />
                   {sheetUrlError && (
                     <p className="text-red-500 mt-2">{sheetUrlError}</p>
@@ -208,7 +206,7 @@ const Modal = ({ isOpen, onClose }) => {
                 <div className="flex justify-end mt-2">
                   <button
                     onClick={validateGoogleSheetUrl}
-                    className="bg-blue-600 text-white p-2 rounded"
+                    className="bg-blue-600 text-white p-2 rounded text-sm"
                   >
                     Validate Link
                   </button>
@@ -217,7 +215,7 @@ const Modal = ({ isOpen, onClose }) => {
               <div className="flex justify-end mt-4">
                 <button
                   onClick={handleSave}
-                  className="bg-blue-600 text-white p-3 rounded"
+                  className="bg-blue-600 text-white p-3 rounded text-sm"
                 >
                   Save
                 </button>
@@ -230,7 +228,7 @@ const Modal = ({ isOpen, onClose }) => {
       {/* UploadComponent Modal Overlay */}
       {isUploadModalOpen && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg relative">
+          <div className="bg-white p-6 rounded-lg shadow-lg relative text-sm">
             <UploadComponent closeUploadModal={closeUploadModal} />
           </div>
         </div>
