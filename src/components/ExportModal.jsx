@@ -131,7 +131,7 @@ const ExportModal = ({ isOpen, onClose, documentType }) => {
 
         {/* Export Type */}
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-medium">Export Type</label>
+          <label className="block text-gray-700  font-medium">Export Type</label>
           <select
             value={exportType}
             onChange={(e) => setExportType(e.target.value)}
@@ -146,13 +146,13 @@ const ExportModal = ({ isOpen, onClose, documentType }) => {
 
         {/* Select/Deselect Options */}
         <div className="flex justify-between mb-4 text-sm">
-          <button onClick={handleSelectAll} className="text-blue-600">Select All</button>
-          <button onClick={handleSelectMandatory} className="text-blue-600 text-sm">Select Mandatory</button>
-          <button onClick={handleDeselectAll} className="text-blue-600 text-sm">Unselect All</button>
+          <button onClick={handleSelectAll} className="text-blue-600 underline">Select All</button>
+          <button onClick={handleSelectMandatory} className="text-blue-600 underline">Select Mandatory</button>
+          <button onClick={handleDeselectAll} className="text-blue-600 underline">Unselect All</button>
         </div>
 
         {/* Fields List */}
-        <div className="max-h-48 overflow-y-auto border border-gray-300 rounded p-1 text-sm">
+        <div className="max-h-48 overflow-y-auto border border-gray-300 rounded p-2">
           {loading ? (
             <p>Loading fields...</p>
           ) : (
@@ -164,7 +164,7 @@ const ExportModal = ({ isOpen, onClose, documentType }) => {
                   onChange={() => toggleField(field.field_name)}
                   className="mr-2"
                 />
-                <label className="text-gray-700 text-sm">{field.field_name}</label>
+                <label className="text-gray-700">{field.field_name}</label>
               </div>
             ))
           )}
@@ -172,7 +172,7 @@ const ExportModal = ({ isOpen, onClose, documentType }) => {
 
         {/* Export Button */}
         <div className="flex justify-end mt-4">
-          <button onClick={handleExport} className="text-sm bg-blue-900 text-white px-5 py-1 rounded">
+          <button onClick={handleExport} className="bg-blue-600 text-white px-4 py-2 rounded">
             Export
           </button>
         </div>

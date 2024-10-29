@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Modal from "./components/Modal"; // Import the modal
+import Sidebar from "./components/Sidebar";
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -17,31 +18,8 @@ const App = () => {
     <>
       <div className="flex h-screen">
         {/* Sidebar */}
-        <div className="w-1/6 bg-gray-50 p-4 border-r">
-          <h2 className="text-lg font-semibold mb-4">Filter By</h2>
-          {/* Filter Dropdowns */}
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Assigned To</label>
-            <select className="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
-              <option>Select...</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Created By</label>
-            <select className="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-500">
-              <option>Select...</option>
-            </select>
-          </div>
-          <div className="mb-4">
-            <label className="block mb-1 font-medium">Tags</label>
-            <button className="text-blue-600">Show Tags</button>
-          </div>
-          {/* Save Filter */}
-          <div className="mt-4">
-            <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700">
-              Save Filter
-            </button>
-          </div>
+        <div>
+          <Sidebar/>
         </div>
 
         {/* Main Content */}

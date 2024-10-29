@@ -6,6 +6,7 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
   const [files, setFiles] = useState([]);
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [spreadsheetLink, setSpreadsheetLink] = useState("");
+  const [spreadsheetData, setSpreadsheetData] = useState([]);
 
   const handleFileUpload = (e) => {
     const newFiles = Array.from(e.target.files);
@@ -25,7 +26,7 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
             stream.getTracks().forEach((track) => track.stop());
           });
         })
-        .catch((error) => {
+        .catch(() => {
           Swal.fire("Error", "Camera access was denied or unavailable.", "error");
         });
     } else {
@@ -37,12 +38,30 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
     setShowLinkInput(true);
   };
 
-  const handleLinkSubmit = () => {
-    const googleSheetRegex = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/;
-    if (googleSheetRegex.test(spreadsheetLink)) {
-      Swal.fire("Success", "Valid Google Spreadsheet link!", "success");
-      setShowLinkInput(false);
-      setSpreadsheetLink("");
+  const handleLinkSubmit = async () => {
+    const googleSheetRegex = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/;
+    const match = spreadsheetLink.match(googleSheetRegex);
+
+    if (match) {
+      const sheetId = match[1];
+      try {
+        const response = await fetch(
+          `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=YOUR_API_KEY`
+        );
+        if (!response.ok) throw new Error("Failed to fetch data");
+
+        const data = await response.json();
+        setSpreadsheetData(data.values || []);
+        Swal.fire("Success", "Valid Google Spreadsheet link!", "success");
+        setShowLinkInput(false);
+        setSpreadsheetLink("");
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Could not fetch spreadsheet data.",
+        });
+      }
     } else {
       Swal.fire({
         icon: "error",
@@ -103,22 +122,20 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
           </button>
         </div>
       </div>
-      <div className="mt-4">
-        {files.length > 0 ? (
-          <div>
-            <h3 className="font-semibold mb-2">Uploaded Files:</h3>
-            <ul className="list-disc pl-5">
-              {files.map((file, index) => (
-                <li key={index} className="text-gray-700">
-                  {file.name} - {(file.size / 1024).toFixed(2)} KB
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <p className="text-gray-500">No files uploaded yet.</p>
-        )}
-      </div>
+      
+      {files.length > 0 && (
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">Uploaded Files:</h3>
+          <ul className="list-disc pl-5">
+            {files.map((file, index) => (
+              <li key={index} className="text-gray-700">
+                {file.name} - {(file.size / 1024).toFixed(2)} KB
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {showLinkInput && (
         <div className="mt-4">
           <input
@@ -133,13 +150,38 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
           </button>
         </div>
       )}
+
+      {spreadsheetData.length > 0 && (
+        <div className="mt-4">
+          <h3 className="font-semibold mb-2">Spreadsheet Preview:</h3>
+          <table className="table-auto w-full text-sm text-left">
+            <thead>
+              <tr>
+                {spreadsheetData[0].map((header, index) => (
+                  <th key={index} className="border p-2 bg-gray-100">{header}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {spreadsheetData.slice(1, 6).map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {row.map((cell, cellIndex) => (
+                    <td key={cellIndex} className="border p-2">{cell}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+      
       <div className="mt-4 flex justify-end">
         <button onClick={handleUpload} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
           Upload
         </button>
       </div>
     </div>
-  );
+  )
 };
 
 export default UploadComponent;
