@@ -3,7 +3,7 @@ import { ImCross } from "react-icons/im";
 import * as XLSX from "xlsx";
 
 const ExportModal = ({ isOpen, onClose, documentType }) => {
-  const [fileType, setFileType] = useState("CSV");
+  const [fileType, setFileType] = useState("Excel");
   const [exportType, setExportType] = useState("All Records");
   const [selectedFields, setSelectedFields] = useState([]);
   const [fields, setFields] = useState([]);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Modal from "./components/Modal"; // Import the modal
 import Sidebar from "./components/Sidebar";
+import Navbar from './components/Navbar';
 
 const App = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -16,6 +17,9 @@ const App = () => {
 
   return (
     <>
+    <div>
+    <Navbar/>
+    </div>
       <div className="flex h-screen">
         {/* Sidebar */}
         <div>
