@@ -96,7 +96,9 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
         setFiles([]); // Clear the files after upload if desired
         onUploadComplete(); // Call the onUploadComplete function to close modals
       });
+
     }
+    setSpreadsheetData([]);
   };
 
   return (
