@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ImCross } from "react-icons/im";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 
 const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
   const [files, setFiles] = useState([]);
@@ -11,6 +12,22 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
   const handleFileUpload = (e) => {
     const newFiles = Array.from(e.target.files);
     setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+
+    // Parse and preview Excel file data
+    const file = newFiles[0]; // Previewing only the first file for simplicity
+    if (file && (file.type.includes("excel") || file.type.includes("spreadsheet"))) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const data = new Uint8Array(event.target.result);
+        const workbook = XLSX.read(data, { type: "array" });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        const sheetData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        setSpreadsheetData(sheetData);
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      Swal.fire("Error", "Please upload a valid Excel file.", "error");
+    }
   };
 
   const handleLibraryClick = () => {
@@ -46,7 +63,7 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
       const sheetId = match[1];
       try {
         const response = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=YOUR_API_KEY`
+          `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=sheets.googleapis.com`
         );
         if (!response.ok) throw new Error("Failed to fetch data");
 
@@ -104,6 +121,7 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
               id="fileUpload"
               type="file"
               multiple
+              accept=".xlsx, .xls"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleFileUpload}
             />
@@ -151,29 +169,32 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
         </div>
       )}
 
-      {spreadsheetData.length > 0 && (
-        <div className="mt-4">
-          <h3 className="font-semibold mb-2">Spreadsheet Preview:</h3>
-          <table className="table-auto w-full text-sm text-left">
-            <thead>
-              <tr>
-                {spreadsheetData[0].map((header, index) => (
-                  <th key={index} className="border p-2 bg-gray-100">{header}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {spreadsheetData.slice(1, 6).map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {row.map((cell, cellIndex) => (
-                    <td key={cellIndex} className="border p-2">{cell}</td>
-                  ))}
-                </tr>
+{spreadsheetData.length > 0 && (
+  <div className="mt-4">
+    <h3 className="font-semibold mb-2">Spreadsheet Preview:</h3>
+    <div className="overflow-auto max-h-64 border border-gray-200 rounded-lg">
+      <table className="table-auto w-full text-sm text-left">
+        <thead>
+          <tr>
+            {spreadsheetData[0].map((header, index) => (
+              <th key={index} className="border p-2 bg-gray-100">{header}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {spreadsheetData.slice(1).map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {row.map((cell, cellIndex) => (
+                <td key={cellIndex} className="border p-2">{cell}</td>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </div>
+)}
+
       
       <div className="mt-4 flex justify-end">
         <button onClick={handleUpload} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
@@ -181,7 +202,7 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
         </button>
       </div>
     </div>
-  )
+  );
 };
 
 export default UploadComponent;
