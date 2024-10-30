@@ -64,7 +64,8 @@ const Modal = ({ isOpen, onClose }) => {
   };
 
   const validateGoogleSheetUrl = () => {
-    const googleSheetRegex = /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/;
+    const googleSheetRegex =
+      /^https:\/\/docs\.google\.com\/spreadsheets\/d\/[a-zA-Z0-9-_]+/;
     if (googleSheetRegex.test(googleSheetUrl)) {
       Swal.fire("Success", "Valid Google Spreadsheet link!", "success");
       setSheetUrlError("");
@@ -81,18 +82,19 @@ const Modal = ({ isOpen, onClose }) => {
       <div className="fixed inset-0 z-30 p-4 sm:p-6 lg:p-8 flex items-center justify-center bg-black bg-opacity-50">
         <div className="bg-white p-4 sm:p-6 lg:p-8 max-w-lg w-full rounded-lg shadow-lg text-sm">
           {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-800"
-          >
-            <ImCross />
-          </button>
 
           {/* Header Section */}
           <div className="mb-6">
+           <div className="flex justify-between items-center"> 
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
               New Data Import
             </h2>
+            <button
+              onClick={onClose}
+              className="text-gray-600 hover:text-gray-800"
+            >
+              <ImCross />
+            </button></div>
             <div className="flex items-center mt-4">
               <input
                 type="checkbox"
@@ -173,7 +175,10 @@ const Modal = ({ isOpen, onClose }) => {
               </button>
               <div className="mt-4 grid gap-4">
                 <label className="block">Import File</label>
-                <button onClick={openUploadModal} className="bg-white p-2 text-sm">
+                <button
+                  onClick={openUploadModal}
+                  className="bg-white p-2 text-sm"
+                >
                   Attach file
                 </button>
               </div>

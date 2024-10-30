@@ -63,7 +63,7 @@ const UploadComponent = ({ closeUploadModal, onUploadComplete }) => {
       const sheetId = match[1];
       try {
         const response = await fetch(
-          `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=sheets.googleapis.com`
+          `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`
         );
         if (!response.ok) throw new Error("Failed to fetch data");
 
